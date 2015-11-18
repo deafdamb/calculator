@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "ViewController.displayValue.setter:ViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ViewController.displayValue.getter:ViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "display.text">
+            </PersistentString>
+            <PersistentString
+               value = "decimalFormatter().decimalSeparator">
+            </PersistentString>
+            <PersistentString
+               value = "NSNumberFormatter().numberFromString(&quot;9.0&quot;)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "ViewController.doOperation(UIButton) -&gt; ():ViewController.swift">
+      </ContextState>
+      <ContextState
+         contextName = "ViewController.addNumber() -&gt; ():ViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "displayValue">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
