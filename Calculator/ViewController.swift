@@ -9,19 +9,33 @@
 import UIKit
 
 class ViewController: UIViewController {
+    var brain = CalculatorBrain()
+    
     var inputInProcess = false
-    var operandStack = [Double]()
-    var lastOperation: String = "="
+    
+    @IBOutlet weak var display: UILabel!
+    
     var displayValue: Double? {
         set {
-            display.text = "\(newValue)"
-            addNumber()
+            if newValue != nil {
+                display.text = decimalFormatter().stringFromNumber(newValue!)
+            } else {
+                display.text = ""
+            }
+            inputInProcess = false
         }
+        
         get {
-            if let numberInText = display.text {
-                return decimalFormatter().numberFromString(numberInText)?.doubleValue
+            if let number = display.text {
+                return decimalFormatter().numberFromString(number)?.doubleValue
             }
             return nil
+        }
+    }
+    
+    @IBOutlet weak var delimeter: UIButton! {
+        didSet {
+            delimeter.setTitle(decimalFormatter().decimalSeparator, forState: UIControlState.Normal)
         }
     }
     
@@ -32,73 +46,64 @@ class ViewController: UIViewController {
         formatter.maximumFractionDigits = 10
         return formatter
     }
-
-    @IBOutlet weak var display: UILabel!
-
+    
     @IBAction func inputDigit(sender: UIButton) {
-        let digit = sender.currentTitle!
-        if inputInProcess {
-            display.text! += digit
-        } else {
-            display.text = digit
-            inputInProcess = true
+        if let digit = sender.currentTitle {
+            if inputInProcess {
+                display.text! += digit
+            } else {
+                display.text! = digit
+                inputInProcess = true
+            }
         }
     }
-
-    @IBAction func doOperation(sender: UIButton) {
-        addNumber()
-        if lastOperation != "=" {
-            switch lastOperation {
-            case "+":  if operandStack.count >= 2 {
-                displayValue = operandStack.removeLast() + operandStack.removeLast()
-                addNumber()
+    
+    @IBAction func inputSymbol(sender: UIButton) {
+        if let symbol = sender.currentTitle {
+            switch symbol {
+            case "±":
+                if inputInProcess && displayValue != 0 {
+                    if displayValue > 0 {
+                        display.text?.insert("-", atIndex: (display.text?.startIndex)!)
+                    } else {
+                        display.text?.removeAtIndex((display.text?.startIndex)!)
+                    }
                 }
-            case "−":  if operandStack.count >= 2 {
-                displayValue = operandStack.removeFirst() - operandStack.removeLast()
-                addNumber()
-                }
-            case "×":  if operandStack.count >= 2 {
-                displayValue = operandStack.removeLast() * operandStack.removeLast()
-                addNumber()
-                }
-            case "÷":  if operandStack.count >= 2 {
-                displayValue = operandStack.removeFirst() / operandStack.removeLast()
-                addNumber()
+            case delimeter.currentTitle!:
+                if inputInProcess {
+                    if display.text?.rangeOfString(symbol) == nil {
+                        display.text! += delimeter.currentTitle!
+                    }
+                } else {
+                    display.text = "0" + delimeter.currentTitle!
+                    inputInProcess = true
                 }
             default: break
             }
         }
-        lastOperation = sender.currentTitle!
-        if sender.currentTitle == "="{
-            displayValue = operandStack.last!
+    }
+    
+    @IBAction func enter() {
+        if let value = displayValue {
+            displayValue = brain.pushOperand(value)
+        }
+    }
+
+    @IBAction func doOperation(sender: UIButton) {
+        if inputInProcess {
+            enter()
+        }
+        if let operation = sender.currentTitle {
+            if let result = brain.performOperation(operation) {
+                displayValue = result
+            } else {
+                displayValue = 0
+            }
         }
     }
     
-    
-    
-    
-    //.numberStyle = NSNumberFormatterStyle.CurrencyStyle
-    //
-    //    for identifier in ["en_US", "fr_FR", "ja_JP"] {
-    //    formatter.locale = NSLocale(localeIdentifier: identifier)
-    //    print("\(identifier) \(formatter.stringFromNumber(1234.5678))")
-    //    }
-    
-    //    formatter.numberStyle = formatter.decimalStyle
-    //    formatter.numberStyle = formatter.dDecimalStyle
-    //    formatter.locale = NSLocale.currentLocale()
-    //    formatter.maximumFractionDigits = 10
-
-    
-    func addNumber() {
-        operandStack.append(displayValue!)
-        inputInProcess = false
-    }
-
     @IBAction func clearValues(sender: UIButton) {
         displayValue = 0
         inputInProcess = false
-        lastOperation = ""
     }
 }
-
